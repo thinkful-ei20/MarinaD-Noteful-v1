@@ -42,10 +42,12 @@ const simDB = {
   find: function (id, callback) {
     setTimeout(() => {
       try {
+        console.log('trying...');
         id = Number(id);
         let item = this.data.find(item => item.id === id);
         callback(null, item);
       } catch (err) {
+        console.log('there is an error');
         callback(err);
       }
     }, DELAY);
