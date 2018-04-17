@@ -78,7 +78,11 @@ const noteful = (function () {
       noteObj.id = store.currentNote.id;
 
       api.update(noteObj.id, noteObj, updateResponse => {
+        
         store.currentNote = updateResponse;
+        const storeNote = store.notes.find(note => note.id === noteObj.id);
+        Object.assign(storeNote, noteObj);
+
 
         render();
       });
