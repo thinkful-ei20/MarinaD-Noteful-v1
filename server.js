@@ -4,77 +4,22 @@ const data = require('./db/notes');
 const simDB = require('./db/simDB');
 const notes = simDB.initialize(data);
 
+
 const {PORT} = require('./config');
-const {logger} = require('./middleware/logger');
 
 console.log('Hello Noteful!');
-
-// INSERT EXPRESS APP CODE HERE...
 
 const express = require('express');
 const app = express();
 
+const morgan = require('morgan');
+const notesRouter = require('./router/notes.router');
 
 app.use(express.static('public'));
-app.use(express.json());
 
-app.use(logger);
+app.use(morgan('dev'));
 
-app.put('/api/notes/:id', (req, res, next)=>{
-  const id = req.params.id;
-
-  const updateObj = {};
-  const updateFields = ['title','content'];
-
-  updateFields.forEach(field => {
-    if (field in req.body) {
-      updateObj[field] = req.body[field];
-    }
-  });
-
-  notes.update(id, updateObj, (err, item) => {
-    if (err) {
-      return next(err);
-    }
-    if (item) {
-      res.json(item);
-    } else {
-      next();
-    }
-  });
-});
-
-app.get('/api/notes', (req, res, next)=>{
-  const searchTerm = req.query.searchTerm;
-  notes.filter(searchTerm, (err, list)=> {
-    
-    if (!err && list) {
-      res.json(list);
-    }
-    next(err);
-  });
-});  
-  
-
-app.get('/api/notes/:id', (req, res, next) => {
-  const id = req.params.id;
-  notes.find(id, (err, note) => {
-
-    if (!err && note) {
-      res.json(note);
-    }    
-    next(err);
-    
-  });
-  // const returnData = data.find(item=> item.id === Number(id));
-  // if (!returnData) next();
-  // res.json(returnData);
-});
-
-//to be deleted
-app.get('/boom', (req, res, next) => {
-  throw new Error('Boom!!');
-});
+app.use('/api/notes', notesRouter);
 
 //error handling
 
