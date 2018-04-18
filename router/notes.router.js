@@ -71,6 +71,18 @@ router.post('/', (req, res, next)=> {
     err.status= 400;
     return next(err);
   }
+
+  notes.create(newItem, (err, item)=> {
+    if (err) {
+      return next(err);
+    }
+    if (item) {
+      res.location(`http://${req.headers.host}/notes/${item.id}`).status(201).json(item);
+    }
+    else {
+      next();
+    }
+  });
 });
 
 module.exports = router;
