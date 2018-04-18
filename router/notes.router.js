@@ -50,11 +50,10 @@ router.get('/:id', (req, res, next) => {
   const id = req.params.id;
   notes.find(id, (err, note) => {
 
-    if (!err && note) {
-      res.json(note);
-    }    
-    next(err);
-    
+    if (err) {
+      next(err);
+    }        
+    res.json(note).end();
   });
   // const returnData = data.find(item=> item.id === Number(id));
   // if (!returnData) next();
@@ -82,6 +81,16 @@ router.post('/', (req, res, next)=> {
     else {
       next();
     }
+  });
+});
+
+router.delete('/:id', (req, res, next)=> {
+  notes.delete(req.params.id, err => {
+    if (err) {
+      err.status = 500;
+      next(err);
+    }
+    res.status(204).end();
   });
 });
 
