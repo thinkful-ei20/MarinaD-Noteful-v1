@@ -21,43 +21,50 @@ router.put('/:id', (req, res, next)=>{
     }
   });
 
-  notes.update(id, updateObj, (err, item) => {
-    if (err) {
-      return next(err);
-    }
-    if (item) {
-      res.json(item);
-    } else {
-      next();
-    }
-  });
+  notes.update(id, updateObj)
+    .then( item => {
+      if(item) {
+        res.json(item);
+      }
+      else {
+        next();
+      }
+    }).catch( err => {
+      next(err);
+    });
 });
 
 //GET
 router.get('/', (req, res, next)=>{
   const searchTerm = req.query.searchTerm;
-  notes.filter(searchTerm, (err, list)=> {
-    
-    if (!err && list) {
-      res.json(list);
-    }
-    next(err);
-  });
-});  
-  
+  notes.filter(searchTerm)
+    .then( list => {
+      if (list) {
+        res.json(list);
+      }
+      else {
+        next();
+      }
+    })
+    .catch(err => {
+      next(err);
+    });
+});
+ 
 
 router.get('/:id', (req, res, next) => {
   const id = req.params.id;
-  notes.find(id, (err, note) => {
-
-    if (err) {
+  notes.find(id)
+    .then( item => {
+      if(item) {
+        res.json(item);
+      }
+      else {
+        next();
+      }
+    }).catch( err => {
       next(err);
-    }        
-    res.json(note).end();
-  });
-  // const returnData = data.find(item=> item.id === Number(id));
-  // if (!returnData) next();
-  // res.json(returnData);
+    });
 });
 
 router.post('/', (req, res, next)=> {
@@ -71,27 +78,27 @@ router.post('/', (req, res, next)=> {
     return next(err);
   }
 
-  notes.create(newItem, (err, item)=> {
-    if (err) {
-      return next(err);
-    }
-    if (item) {
-      res.location(`http://${req.headers.host}/notes/${item.id}`).status(201).json(item);
-    }
-    else {
-      next();
-    }
-  });
+  notes.create(newItem)
+    .then (item => {
+      if (item) {
+        res.location(`http://${req.headers.host}/notes/${item.id}`).status(201).json(item);
+      }
+      else {
+        next();
+      }
+    }).catch( err => {
+      next(err);
+    });
 });
 
 router.delete('/:id', (req, res, next)=> {
-  notes.delete(req.params.id, err => {
-    if (err) {
-      err.status = 500;
+  notes.delete(req.params.id)
+    .then(() => {
+      res.sendStatus(204);
+    })
+    .catch( err => {
       next(err);
-    }
-    res.status(204).end();
-  });
+    });
 });
 
 module.exports = router;
