@@ -41,7 +41,7 @@ app.use (function (err, req, res, next) {
 });
 
 if (require.main === module) {
-  app.listen(process.env.port, function () {
+  app.listen(process.env.PORT, function () {
     console.info('Server listening on');
   }).on('error', err=> {console.error(err);});
 }
